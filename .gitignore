@@ -1,3 +1,4 @@
+# Dependencies
 node_modules/
 
 # Log files
@@ -15,3 +16,7 @@ logs/
 
 # Build output
 dist/
+
+# Temporary files
+tmp/
+temp/
