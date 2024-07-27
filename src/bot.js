@@ -4,6 +4,7 @@ const { connect, mongoose } = require("mongoose");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+const logger = require('./utils/logger');
 
 const client = new Client({
   intents: [
@@ -74,5 +75,5 @@ client.handleCommands();
 client.handleComponents();
 client.login(token);
 (async () => {
-  await connect(databaseToken).catch(console.error);
+  await connect(databaseToken).catch(error => logger.error(`Login failed: ${error.message}`));
 })();
