@@ -1,8 +1,8 @@
 # Your Discord Bot Name
 
-[![License](https://img.shields.io/github/license/jamie1030games/baosbot.svg)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/your-username/your-repo.svg)](https://github.com/jamie1030games/baosbot/stargazers)
-[![Issues](https://img.shields.io/github/issues/your-username/your-repo.svg)](https://github.com/jamie1030games/baosbot/issues)
+[![License](https://img.shields.io/github/license/Jamie1030Games/baosbot.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/your-username/your-repo.svg)](https://github.com/Jamie1030Games/baosbot/stargazers)
+[![Issues](https://img.shields.io/github/issues/your-username/your-repo.svg)](https://github.com/Jamie1030Games/baosbot/issues)
 
 ## Table of Contents
 - [Introduction](#introduction)
