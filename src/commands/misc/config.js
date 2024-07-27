@@ -4,12 +4,18 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
-  PermissionsBitField
+  PermissionsBitField,
 } = require("discord.js");
 const Guild = require("../../schemas/guild");
 const getHexCode = require("../../functions/converters/colorConverter");
 
-const settings = ["setColor", "welcomeEnabled", "verifyEnabled", "muteRole", "levelEnabled"];
+const settings = [
+  "setColor",
+  "welcomeEnabled",
+  "verifyEnabled",
+  "muteRole",
+  "levelEnabled",
+];
 let currentIndex = 0;
 
 module.exports = {
@@ -18,8 +24,11 @@ module.exports = {
     .setDescription("Configure your server with features you desire.")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
   async execute(interaction) {
-    if (!interaction.member.permissions.has('ADMINISTRATOR')) {
-      return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true });
+    if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+      return interaction.reply({
+        content: "You do not have permission to use this command.",
+        ephemeral: true,
+      });
     }
     const guildId = interaction.guildId;
     const embed = createEmbed(settings[currentIndex]);
@@ -53,10 +62,14 @@ module.exports = {
     collector.on("collect", async (i) => {
       if (i.customId === "back") {
         currentIndex = (currentIndex - 1 + settings.length) % settings.length;
-        await i.update({
-          embeds: [createEmbed(settings[currentIndex])],
-          components: [row],
-        });
+        try {
+          await i.update({
+            embeds: [createEmbed(settings[currentIndex])],
+            components: [row],
+          });
+        } catch (error) {
+          console.error(error);
+        }
       } else if (i.customId === "set") {
         await handleSetting(interaction, settings[currentIndex], guildId);
         collector.stop();
@@ -70,7 +83,11 @@ module.exports = {
     });
 
     collector.on("end", () => {
-      message.edit({ components: [] });
+      try {
+        message.edit({ components: [] });
+      } catch (error) {
+        console.error(error);
+      }
     });
   },
 };

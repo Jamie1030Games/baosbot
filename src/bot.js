@@ -44,6 +44,29 @@ for (const folder of functionFolders) {
   }
 }
 
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Bot is shutting down... due to sigint');
+  client.destroy();
+  process.exit();
+});
+
+process.on('SIGTERM', () => {
+  console.log('Bot is shutting down... due to sigterm');
+  client.destroy();
+  process.exit();
+});
+
+// Handling unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 mongoose.set("strictQuery", false);
 
 client.handleEvents();
