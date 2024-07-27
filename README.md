@@ -25,8 +25,8 @@ Follow this link to add it directly to your server: [bao's bot](https://discord.
 
 ## Usage
 After inviting the bot to your Discord server, use the following commands to set up the bot to your desires:
-```sh
+```
 /config
 
-```sh
 /help
+```
