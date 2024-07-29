@@ -23,6 +23,6 @@ temp/
 
 patches
 
-.vs
+.vs/
 
 eslint.config.mjs
