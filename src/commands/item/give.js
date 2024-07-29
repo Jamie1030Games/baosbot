@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const Item = require('../../schemas/item');
 const User = require('../../schemas/user');
 const convertMilliseconds = require('../../functions/converters/convertMilliseconds.js');
@@ -8,6 +8,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('giveitem')
     .setDescription('Give an item to a user')
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .addStringOption(option =>
       option.setName('itemname')
         .setDescription('The name of the item to give')
