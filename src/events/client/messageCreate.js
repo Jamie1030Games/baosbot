@@ -7,7 +7,7 @@ const { consola } = require("consola");
 const c = require('ansi-colors');
 
 const XP_AMOUNT = 10; // Amount of XP to add per message
-const COOLDOWN = 0.000001 * 1000; // Cooldown period in milliseconds (5 seconds)
+const COOLDOWN = 7 * 1000; // Cooldown period in milliseconds (5 seconds)
 
 // Function to calculate XP needed for the next level
 const calculateXpForNextLevel = (level) => {
