@@ -1,4 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const Item = require('../../schemas/item.js');
 const User = require('../../schemas/user.js');

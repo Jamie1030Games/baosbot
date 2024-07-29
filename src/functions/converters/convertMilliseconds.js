@@ -1,6 +1,5 @@
 function convertMilliseconds(ms) {
   if (typeof ms !== 'number' || ms < 0) {
-    console.error(`Invalid input: ${ms}`);
     return null;
   }
 

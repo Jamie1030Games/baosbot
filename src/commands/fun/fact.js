@@ -1,4 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const { EmbedBuilder } = require('discord.js');
 const fetch = require('node-fetch'); // Ensure you have 'node-fetch' installed
 const Guild = require('../../schemas/guild');

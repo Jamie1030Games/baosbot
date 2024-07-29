@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const {
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,7 +10,6 @@ const {
 } = require("discord.js");
 const Guild = require("../../schemas/guild");
 const getHexCode = require("../../functions/converters/colorConverter");
-const guild = require("../../schemas/guild");
 
 const settings = [
   "setColor",
@@ -97,7 +98,7 @@ function createEmbed(setting) {
   return new EmbedBuilder()
     .setTitle(`Configure: ${setting}`)
     .setDescription(`Use the buttons below to navigate and set the ${setting}.`)
-    .setColor(guild.config.embedColor);
+    .setColor('#FFFFFF');
 }
 
 async function handleSetting(interaction, setting, guildId) {

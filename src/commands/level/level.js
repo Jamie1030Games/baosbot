@@ -1,5 +1,7 @@
 // src/commands/tools/level.js
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const canvafy = require("canvafy");
 const mongoose = require("mongoose");
 const UserSchema = require("../../schemas/user.js"); // Adjust the path as needed

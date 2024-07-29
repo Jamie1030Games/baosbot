@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const Guild = require("../../schemas/guild");
 const { PermissionsBitField } = require('discord.js');
 

@@ -1,4 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const User = require('../../schemas/user'); // Adjust path as needed
 const Item = require('../../schemas/item'); // Adjust path as needed
 

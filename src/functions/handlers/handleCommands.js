@@ -1,6 +1,9 @@
+/* eslint-disable no-undef */
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
 const fs = require("fs");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 module.exports = (client) => {
   client.handleCommands = async () => {
@@ -24,7 +27,7 @@ module.exports = (client) => {
     const rest = new REST({ version: "10" }).setToken(process.env.token);
 
     try {
-      console.log("Started refreshing application (/) commands.");
+      consola.start(c.cyan("Started refreshing application (/) commands."));
 
       // Get all the guilds the bot is in
       const guilds = client.guilds.cache.map((guild) => guild.id);
@@ -35,13 +38,13 @@ module.exports = (client) => {
           await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
             body: client.commandArray,
           });
-          console.log(`Successfully reloaded application (/) commands for guild ID ${guildId}.`);
+          consola.success(c.green(`Successfully reloaded application (/) commands for guild ID ${guildId}.`));
         } catch (error) {
-          console.error(`Failed to register commands for guild ID ${guildId}:`, error);
+          consola.error(c.red(`Failed to register commands for guild ID ${guildId}:`, error));
         }
       }
     } catch (error) {
-      console.error("Error refreshing application commands:", error);
+      consola.error(c.red("Error refreshing application commands:", error));
     }
   };
 
@@ -50,7 +53,7 @@ module.exports = (client) => {
   });
 
   client.on("guildCreate", async (guild) => {
-    console.log(`Joined new guild: ${guild.name}`);
+    consola.info(c.cyan(`Joined new guild: ${guild.name}`));
     await client.handleCommands();
   });
 };

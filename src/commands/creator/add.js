@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const {
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,6 +10,7 @@ const {
 } = require("discord.js"); // Import ActionRowBuilder
 const Item = require("../../schemas/item");
 const Guild = require('../../schemas/guild');
+
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -65,7 +68,7 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
+        consola.info(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
       console.error(`Error adding guild to the database:`, error);

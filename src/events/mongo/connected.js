@@ -1,8 +1,9 @@
 const c = require('ansi-colors');
+const { consola } = require("consola");
 
 module.exports = {
    name: 'connected',
    execute() {
-      console.log(c.green('[DATABASE CONNECTED]'));
+      consola.success(c.green('[DATABASE CONNECTED]'));
    },
 };

@@ -1,8 +1,9 @@
 const c = require('ansi-colors');
+const { consola } = require("consola");
 
 module.exports = {
    name: 'connecting',
    execute() {
-      console.log(c.cyan('[DATABASE CONNECTING...]'));
+      consola.info(c.cyan('[DATABASE CONNECTING...]'));
    },
 };

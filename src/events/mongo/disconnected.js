@@ -1,8 +1,9 @@
 const c = require('ansi-colors');
+const { consola } = require("consola");
 
 module.exports = {
    name: 'disconnected',
    execute() {
-      console.log(c.red('[DATABASE DISCONNECTED]'));
+      consola.warn(c.yellow('[DATABASE DISCONNECTED]'));
    },
 };

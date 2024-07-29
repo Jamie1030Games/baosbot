@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
 // jobs/fish.js
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 const {
   ActionRowBuilder,
   ButtonBuilder,
