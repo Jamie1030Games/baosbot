@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
-const Item = require('../../schemas/item');
-const User = require('../../schemas/user');
+const Item = require('../../schemas/item.js');
+const User = require('../../schemas/user.js');
 const convertMilliseconds = require('../../functions/converters/convertMilliseconds.js');
-const Guild = require('../../schemas/guild');
+const Guild = require('../../schemas/guild.js');
 
 module.exports = {
   data: new SlashCommandBuilder()

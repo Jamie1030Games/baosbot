@@ -6,9 +6,10 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const User = require("../../schemas/user");
-const Guild = require('../../schemas/guild');
+const Guild = require("../../schemas/guild");
+const mongoose = require("mongoose");
 
-const TAX_RATE = 0.05; // 5% tax
+let TAX_RATE = 0.05; // 5% tax
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -57,17 +58,55 @@ module.exports = {
         ephemeral: true,
       });
     }
-    const tax = amount * TAX_RATE; // Calculate tax
-    const amountAfterTax = amount - tax; // Amount to transfer after tax
 
-    const user = await User.findOne({ userId: interaction.user.id });
+    let userId = interaction.user.id;
+    let user = await User.findOne({ userId: userId });
 
-    if (!user || user.coins < amount) {
+    if (!user) {
+      user = new User({
+        _id: new mongoose.Types.ObjectId(),
+        userId,
+        coins: 0,
+        level: 1,
+        xp: 0,
+      });
+      await user.save();
+    }
+
+    if (user.coins < amount) {
       return interaction.reply({
         content: `You don't have enough coins to transfer.`,
         ephemeral: true,
       });
     }
+
+    const hasNoTaxItem = user.items.some(
+      (item) => item.type === "no_tax" && item.notaxAmt >= 1
+    );
+
+    if (hasNoTaxItem) {
+      TAX_RATE = 0;
+      const noTaxItemIndex = user.items.findIndex(
+        (item) => item.notaxAmt > 0 && item.type === "no_tax"
+      );
+
+      // Select the no-tax item
+      const noTaxItem = user.items[noTaxItemIndex];
+
+      // Decrease the no_taxAmt by 1
+      noTaxItem.notaxAmt -= 1;
+
+      // Remove the item if no_taxAmt is 0 or negative
+      if (noTaxItem.notaxAmt <= 0) {
+        user.items.splice(noTaxItemIndex, 1); // Remove item from inventory
+      }
+
+      // Save the updated user document
+      await user.save();
+    }
+
+    const tax = amount * TAX_RATE; // Calculate tax
+    const amountAfterTax = amount - tax; // Amount to transfer after tax
 
     // Create confirmation buttons
     const confirmButton = new ButtonBuilder()
@@ -85,15 +124,17 @@ module.exports = {
       cancelButton
     );
 
-    // Create and send the embed message
+    const description = hasNoTaxItem
+      ? `💰 You are about to transfer ${amountAfterTax} coins to ${target.username}. You will not be taxed due to one of your items.`
+      : `💰 You are about to transfer ${amountAfterTax} coins to ${
+          target.username
+        }. A tax of ${tax.toFixed(2)} will be applied. Do you want to proceed?`;
+
+    // Create the embed with the determined description
     const confirmEmbed = new EmbedBuilder()
       .setColor(existingGuild.config.embedColor)
       .setTitle("Transfer Confirmation")
-      .setDescription(
-        `💰 You are about to transfer ${amountAfterTax} coins to ${
-          target.username
-        }. A tax of ${tax.toFixed(2)} will be applied. Do you want to proceed?`
-      )
+      .setDescription(description)
       .setTimestamp();
 
     await interaction.reply({

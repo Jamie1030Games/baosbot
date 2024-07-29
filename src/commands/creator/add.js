@@ -34,12 +34,6 @@ module.exports = {
     )
     .addIntegerOption((option) =>
       option
-        .setName("notax")
-        .setDescription("The amount of transactions that aren't taxed")
-        .setRequired(true)
-    )
-    .addIntegerOption((option) =>
-      option
         .setName("price")
         .setDescription("Price of the item in coins")
         .setRequired(true)
@@ -82,7 +76,6 @@ module.exports = {
     const price = interaction.options.getInteger("price");
     const type = interaction.options.getString("type");
     const isUnique = interaction.options.getBoolean("unique");
-    const notaxAmt = interaction.options.getInteger("notax");
 
     const embed = new EmbedBuilder()
       .setColor(existingGuild.config.embedColor)
@@ -120,7 +113,7 @@ module.exports = {
       if (i.customId === "confirm") {
         let multiplier = 1;
         let luckBoost = 0;
-        let notax = 0;
+        let notaxAmt = 0;
 
         if (type === "coin_multiplier") {
           await i.channel.send("Please enter the multiplier value:");
@@ -154,7 +147,7 @@ module.exports = {
             time: 60000,
             errors: ["time"],
           });
-          notax = parseFloat(taxResponse.first().content);
+          notaxAmt = parseFloat(taxResponse.first().content);
         }
 
         const newItem = new Item({
@@ -164,12 +157,13 @@ module.exports = {
           price,
           type,
           multiplier,
-          notax,
+          notaxAmt,
           luckBoost,
           isUnique,
         });
 
         await newItem.save();
+        console.log(newItem.notaxAmt)
         await i.channel.send(
           `Item **${name}** has been added to the shop with the following details:\nMultiplier: ${multiplier}\nLuck Boost: ${luckBoost}%`
         );

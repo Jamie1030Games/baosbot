@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
         enum: ["coin_multiplier", "luck_booster", "no_tax", "other"],
         required: true,
       },
+      notaxAmt: { type: Number, default: '0' },
       luckboost: String,
       expirationDate: Date,
       isUnique: { type: String, default: 'false' },

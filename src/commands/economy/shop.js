@@ -68,7 +68,7 @@ module.exports = {
           .addFields(
             {
               name: "Effect",
-              value: item.effect || "No effect",
+              value: item.type || "No effect",
             },
             {
               name: "Price",
@@ -211,7 +211,7 @@ module.exports = {
             } else if (item.type === "luck_booster") {
               newItem.luckboost = item.luckboost;
             } else if (item.type === "no_tax") {
-              newItem.no_tax = item.no_tax;
+              newItem.notaxAmt = item.notaxAmt;
             }
 
             user.items.push(newItem);

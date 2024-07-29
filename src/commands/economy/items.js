@@ -78,7 +78,9 @@ module.exports = {
           value: `Effect: ${item.description}\nExpires: ${expirationDate}`,
           inline: false,
         });
+        console.log(item.notaxAmt);
       });
+
 
       return embed;
     };

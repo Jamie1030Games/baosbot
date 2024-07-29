@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
-const User = require('../../schemas/user'); // Adjust the path as necessary
+const User = require('../../schemas/user.js'); // Adjust the path as necessary
 const Guild = require('../../schemas/guild.js');
 
 module.exports = {
