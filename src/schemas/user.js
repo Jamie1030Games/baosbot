@@ -27,7 +27,10 @@ const userSchema = new mongoose.Schema({
       isUnique: { type: String, default: 'false' },
     },
   ],
-  lastDaily: { type: Number, default: 86400000 },
+  dailies: {
+    lastDaily: { type: Number, default: 86400000 },
+    dailyInARow: { type: Number, default: 0 },
+  },
   job: {
     jobType: {
       type: String,
