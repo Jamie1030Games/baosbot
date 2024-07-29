@@ -8,12 +8,29 @@ const {
 } = require("discord.js");
 const User = require("../../schemas/user");
 const timeUntil = require("../../functions/converters/timeUntil");
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("items")
     .setDescription("View all your current items and their effects."),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const user = await User.findOne({ userId: interaction.user.id });
 
     if (!user || user.items.length === 0) {
@@ -43,7 +60,7 @@ module.exports = {
       const currentItems = combinedItems.slice(start, end);
 
       const embed = new EmbedBuilder()
-        .setColor("#00FF00")
+        .setColor(existingGuild.config.embedColor)
         .setTitle("Your Items")
         .setDescription("Here are the items you currently have:")
         .setFooter({ text: `Page ${page + 1} of ${totalPages}` });

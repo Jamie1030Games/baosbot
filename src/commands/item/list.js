@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const Item = require('../../schemas/item');
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -8,6 +9,22 @@ module.exports = {
     .setDescription('List all items in the shop'),
 
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     try {
       const items = await Item.find();
 
@@ -16,7 +33,7 @@ module.exports = {
       }
 
       const embed = new EmbedBuilder()
-        .setColor('#00FFFF')
+        .setColor(existingGuild.config.embedColor)
         .setTitle('Item List')
         .setDescription('Here are all the items in the shop:')
         .setTimestamp();

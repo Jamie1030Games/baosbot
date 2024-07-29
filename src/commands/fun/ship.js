@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const canvafy = require("canvafy");
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,6 +20,22 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const target = interaction.options.getUser("target");
     const target2 = interaction.options.getUser("target2");
     const targetPfp = target.displayAvatarURL({
@@ -36,7 +53,7 @@ module.exports = {
         "image",
         "https://www.designyourway.net/blog/wp-content/uploads/2018/11/pastel-background-goo-1536x864.jpg"
       )
-      .setBorder("#f0f0f0")
+      .setBorder(existingGuild.config.embedColor)
       .setOverlayOpacity(0.5)
       .build();
 

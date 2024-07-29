@@ -1,27 +1,45 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const {
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
-} = require('discord.js');
-const Item = require('../../schemas/item');
-const User = require('../../schemas/user');
-const convertMilliseconds = require('../../functions/converters/convertMilliseconds.js');
+} = require("discord.js");
+const Item = require("../../schemas/item");
+const User = require("../../schemas/user");
+const convertMilliseconds = require("../../functions/converters/convertMilliseconds.js");
+const Guild = require("../../schemas/guild.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('shop')
-    .setDescription('Browse and buy items from the shop'),
+    .setName("shop")
+    .setDescription("Browse and buy items from the shop"),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
+    let embedUnique;
     let itemExp;
     try {
       // Fetch items and filter out items that are off sale
-      const items = await Item.find({ isOffSale: { $ne: 'true' } });
+      const items = await Item.find({ isOffSale: { $ne: "true" } });
 
       if (items.length === 0) {
-        return interaction.reply('No items available in the shop.');
+        return interaction.reply("No items available in the shop.");
       }
 
       let page = 0;
@@ -37,22 +55,32 @@ module.exports = {
           console.error(error.message);
         }
 
+        if (item.isUnique == 'true') {
+          embedUnique = 'Yes (only 1)';
+        } else if (item.isUnique == 'false') {
+          embedUnique = 'No (stacks)';
+        }
+
         const embed = new EmbedBuilder()
-          .setColor('#00FF00')
+          .setColor(existingGuild.config.embedColor)
           .setTitle(item.name)
-          .setDescription(item.description || 'No description available')
+          .setDescription(item.description || "No description available")
           .addFields(
             {
-              name: 'Effect',
-              value: item.effect || 'No effect',
+              name: "Effect",
+              value: item.effect || "No effect",
             },
             {
-              name: 'Price',
+              name: "Price",
               value: `${item.price} coins`,
             },
             {
-              name: 'Expiration',
-              value: itemExp ? itemExp : 'Never',
+              name: "Unique Item",
+              value: `${embedUnique}`,
+            },
+            {
+              name: "Expiration",
+              value: itemExp ? itemExp : "Never",
             }
           )
           .setFooter({ text: `Page ${page + 1} of ${totalPages}` });
@@ -63,27 +91,27 @@ module.exports = {
       const generateComponents = (page) => {
         const row = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
-            .setCustomId('first')
-            .setLabel('First')
+            .setCustomId("first")
+            .setLabel("First")
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(page === 0),
           new ButtonBuilder()
-            .setCustomId('prev')
-            .setLabel('Previous')
+            .setCustomId("prev")
+            .setLabel("Previous")
             .setStyle(ButtonStyle.Primary)
             .setDisabled(page === 0),
           new ButtonBuilder()
             .setCustomId(`buy_${page}`)
-            .setLabel('Buy')
+            .setLabel("Buy")
             .setStyle(ButtonStyle.Success),
           new ButtonBuilder()
-            .setCustomId('next')
-            .setLabel('Next')
+            .setCustomId("next")
+            .setLabel("Next")
             .setStyle(ButtonStyle.Primary)
             .setDisabled(page === totalPages - 1),
           new ButtonBuilder()
-            .setCustomId('last')
-            .setLabel('Last')
+            .setCustomId("last")
+            .setLabel("Last")
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(page === totalPages - 1)
         );
@@ -105,32 +133,59 @@ module.exports = {
         time: 60000,
       });
 
-      collector.on('collect', async (i) => {
+      collector.on("collect", async (i) => {
         try {
-          if (i.customId === 'prev') {
+          if (i.customId === "prev") {
             page = Math.max(page - 1, 0);
-          } else if (i.customId === 'next') {
+          } else if (i.customId === "next") {
             page = Math.min(page + 1, totalPages - 1);
-          } else if (i.customId === 'first') {
+          } else if (i.customId === "first") {
             page = 0;
-          } else if (i.customId === 'last') {
+          } else if (i.customId === "last") {
             page = totalPages - 1;
-          } else if (i.customId.startsWith('buy_')) {
-            const itemIndex = parseInt(i.customId.split('_')[1]);
+          } else if (i.customId.startsWith("buy_")) {
+            const itemIndex = parseInt(i.customId.split("_")[1]);
             const item = items[itemIndex];
             const user = await User.findOne({ userId: interaction.user.id });
 
             if (!user || user.coins < item.price) {
               return i.reply({
-                content: 'You do not have enough coins to buy this item.',
+                content: "You do not have enough coins to buy this item.",
                 ephemeral: true,
               });
             }
 
-            // Check if user already has 3 items
-            if (user.items.length >= 3) {
+            const petTurtleCount = user.items.filter(
+              (item) => item.name === "Pet Turtle"
+            ).length;
+
+            // Log the pet turtle count for debugging
+            console.log(`Pet Turtle Count: ${petTurtleCount}`);
+
+            // Check if the user already has a unique item
+            const hasUnique = user.items.some(
+              (existingItem) =>
+                existingItem.isUnique === "true" &&
+                existingItem.name === item.name
+            );
+
+            // Log the `hasUnique` result for debugging
+            console.log(`Has Unique: ${hasUnique}`);
+            console.log(
+              `Current Item: ${item.name}, isUnique: ${item.isUnique}`
+            );
+
+            if (petTurtleCount >= 3 && item.name === "Pet Turtle") {
               return i.reply({
-                content: 'You cannot buy more than 3 items.',
+                content: "You cannot buy more than 3 Pet Turtles.",
+                ephemeral: true,
+              });
+            }
+
+            if (item.isUnique === "true" && hasUnique) {
+              return i.reply({
+                content:
+                  "This item is unique. You may only have one at a time.",
                 ephemeral: true,
               });
             }
@@ -148,25 +203,21 @@ module.exports = {
               luckboost: item.luckBoost,
               type: item.type,
               expirationDate,
+              isUnique: item.isUnique,
             };
 
-            if (item.type === 'coin_multiplier') {
+            if (item.type === "coin_multiplier") {
               newItem.multiplier = item.multiplier;
-            } else if (item.type === 'luck_booster') {
+            } else if (item.type === "luck_booster") {
               newItem.luckboost = item.luckboost;
-            } else if (item.type === 'no_tax') {
+            } else if (item.type === "no_tax") {
               newItem.no_tax = item.no_tax;
             }
 
             user.items.push(newItem);
             await user.save();
 
-            // Check if there is already an active item with an expirationDate
-            const activeItem = user.items.some(
-              (userItem) => userItem.expirationDate && userItem.expirationDate > Date.now()
-            );
-
-            if (!activeItem && expirationDate) {
+            if (expirationDate) {
               setTimeout(async () => {
                 try {
                   const updatedUser = await User.findOne({
@@ -183,31 +234,39 @@ module.exports = {
                     // Remove the item from the database if expired
                     await User.updateOne(
                       { userId: interaction.user.id },
-                      { $pull: { items: { expirationDate: { $lt: Date.now() } } } }
+                      {
+                        $pull: {
+                          items: { expirationDate: { $lt: Date.now() } },
+                        },
+                      }
                     );
 
                     await updatedUser.save();
                   }
                 } catch (error) {
-                  console.error('Error removing expired item:', error);
+                  console.error("Error removing expired item:", error);
                 }
               }, item.expirationDuration);
             }
 
             const confirmationEmbed = new EmbedBuilder()
-              .setColor('#00FF00')
-              .setTitle('Purchase Confirmation')
+              .setColor(existingGuild.config.embedColor)
+              .setTitle("Purchase Confirmation")
               .setDescription(
                 `You successfully bought **${item.name}** for **${item.price} coins**!`
               )
               .addFields(
                 {
-                  name: 'Effect',
-                  value: item.description || 'No effect',
+                  name: "Effect",
+                  value: item.description || "No effect",
                 },
                 {
-                  name: 'Expiration',
-                  value: itemExp ? itemExp : 'Never',
+                  name: "Unique Item",
+                  value: embedUnique,
+                },
+                {
+                  name: "Expiration",
+                  value: itemExp ? itemExp : "Never",
                 }
               )
               .setTimestamp();
@@ -224,30 +283,31 @@ module.exports = {
             components: generateComponents(page),
           });
         } catch (error) {
-          console.error('Error handling interaction:', error);
+          console.error("Error handling interaction:", error);
           if (error.code === 10008) {
             await i.reply({
-              content: 'The message you were interacting with no longer exists.',
+              content:
+                "The message you were interacting with no longer exists.",
               ephemeral: true,
             });
           } else {
             await i.reply({
-              content: 'An error occurred while processing your request.',
+              content: "An error occurred while processing your request.",
               ephemeral: true,
             });
           }
         }
       });
 
-      collector.on('end', () => {
+      collector.on("end", () => {
         embedMessage.edit({
           components: [],
         });
       });
     } catch (error) {
-      console.error('Error executing shop command:', error);
+      console.error("Error executing shop command:", error);
       await interaction.reply({
-        content: 'An error occurred while processing the shop command.',
+        content: "An error occurred while processing the shop command.",
         ephemeral: true,
       });
     }

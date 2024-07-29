@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder, PermissionsBitField } = require("discord.js");
 const User = require("../../schemas/user"); // Adjust the path as necessary
+const Guild = require("../../schemas/guild");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,6 +21,22 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const target = interaction.options.getUser("target");
     const amount = interaction.options.getInteger("amount");
 
@@ -36,7 +53,7 @@ module.exports = {
       await user.save();
 
       const successEmbed = new EmbedBuilder()
-        .setColor("#00FF00")
+        .setColor(existingGuild.config.embedColor)
         .setTitle("Coins Added")
         .setDescription(
           `Successfully added ${amount} coins to ${target.username}.`

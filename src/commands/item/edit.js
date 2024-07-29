@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const Item = require('../../schemas/item');
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,6 +24,22 @@ module.exports = {
             .setRequired(true)
     ),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const itemName = interaction.options.getString('name');
     const field = interaction.options.getString('field');
     const value = interaction.options.getString('value');
@@ -64,7 +81,7 @@ module.exports = {
       await item.save();
 
       const embed = new EmbedBuilder()
-        .setColor('#00FF00')
+        .setColor(existingGuild.config.embedColor)
         .setTitle('Item Edited')
         .setDescription(`The item "${itemName}" has been updated.`)
         .addFields(

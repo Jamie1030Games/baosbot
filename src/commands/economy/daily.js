@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const User = require('../../schemas/user');
 const handleCoins = require("../../middleware/coinAdder");
+const Guild = require('../../schemas/guild');
 
 const DAILY_COINS = 100; // Amount of coins given daily
 const DAILY_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -11,6 +12,22 @@ module.exports = {
     .setName('daily')
     .setDescription('Claim your daily coins'),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const user = await User.findOne({ userId: interaction.user.id });
 
     const finalPrice = await handleCoins(interaction.user.id, DAILY_COINS);
@@ -26,7 +43,7 @@ module.exports = {
       await newUser.save();
 
       const dailyEmbed = new EmbedBuilder()
-        .setColor('#FFD700')
+        .setColor(existingGuild.config.embedColor)
         .setTitle('Daily Reward')
         .setDescription(`You have claimed ${finalPrice} coins!`)
         .setTimestamp();
@@ -58,7 +75,7 @@ module.exports = {
 
     // Create the embed
     const embed = new EmbedBuilder()
-      .setColor('#FFD700')
+      .setColor(existingGuild.config.embedColor)
       .setTitle('Daily Reward')
       .setDescription(description)
       .setTimestamp();

@@ -7,6 +7,7 @@ const {
   PermissionsBitField
 } = require("discord.js"); // Import ActionRowBuilder
 const Item = require("../../schemas/item");
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -59,6 +60,22 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
     const expirationDuration = interaction.options.getInteger("expiration");
@@ -68,7 +85,7 @@ module.exports = {
     const notaxAmt = interaction.options.getInteger("notax");
 
     const embed = new EmbedBuilder()
-      .setColor("#00FF00")
+      .setColor(existingGuild.config.embedColor)
       .setTitle("Add Item Details")
       .setDescription(`You are adding a **${name}** to the shop.`)
       .addFields(

@@ -3,6 +3,7 @@ const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const Item = require('../../schemas/item');
 const User = require('../../schemas/user');
 const convertMilliseconds = require('../../functions/converters/convertMilliseconds.js');
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,6 +21,22 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const itemName = interaction.options.getString('itemname');
     const targetUser = interaction.options.getUser('user');
 
@@ -73,7 +90,7 @@ module.exports = {
 
       // Send a confirmation message
       const confirmationEmbed = new EmbedBuilder()
-        .setColor('#00FF00')
+        .setColor(existingGuild.config.embedColor)
         .setTitle('Item Given')
         .setDescription(`You have given **${item.name}** to **${targetUser.username}**!`)
         .addFields(

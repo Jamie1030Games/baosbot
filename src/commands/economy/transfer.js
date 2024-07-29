@@ -6,6 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const User = require("../../schemas/user");
+const Guild = require('../../schemas/guild');
 
 const TAX_RATE = 0.05; // 5% tax
 
@@ -26,6 +27,22 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const target = interaction.options.getUser("target");
     if (target.id == interaction.user.id) {
       return interaction.reply({
@@ -70,7 +87,7 @@ module.exports = {
 
     // Create and send the embed message
     const confirmEmbed = new EmbedBuilder()
-      .setColor("#FFCC00")
+      .setColor(existingGuild.config.embedColor)
       .setTitle("Transfer Confirmation")
       .setDescription(
         `💰 You are about to transfer ${amountAfterTax} coins to ${
@@ -108,7 +125,7 @@ module.exports = {
         await user.save();
 
         const dmEmbed = new EmbedBuilder()
-          .setColor("#00FF00")
+          .setColor(existingGuild.config.embedColor)
           .setTitle("You Received Coins!")
           .setDescription(
             `You have received ${amountAfterTax} coins from ${interaction.user.username}.`
@@ -138,7 +155,7 @@ module.exports = {
         await i.update({ embeds: [successEmbed], components: [] });
       } else if (i.customId === "cancel_transfer") {
         const cancelEmbed = new EmbedBuilder()
-          .setColor("#FF0000")
+          .setColor(existingGuild.config.embedColor)
           .setTitle("Transfer Cancelled")
           .setDescription("The coin transfer has been cancelled.")
           .setTimestamp();
@@ -150,7 +167,7 @@ module.exports = {
     collector.on("end", (collected) => {
       if (collected.size === 0) {
         const timeoutEmbed = new EmbedBuilder()
-          .setColor("#FF0000")
+          .setColor(existingGuild.config.embedColor)
           .setTitle("Timeout")
           .setDescription("The coin transfer request timed out.")
           .setTimestamp();

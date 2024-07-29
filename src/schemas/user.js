@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
       },
       luckboost: String,
       expirationDate: Date,
+      isUnique: { type: String, default: 'false' },
     },
   ],
   lastDaily: { type: Number, default: 86400000 },

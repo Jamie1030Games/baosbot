@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const User = require("../../schemas/user");
 const handleCoins = require("../../middleware/coinAdder");
+const Guild = require('../../schemas/guild');
 
 // Reward multipliers for each tier
 const REWARD_MULTIPLIERS = {
@@ -25,6 +26,22 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     const riskAmount = interaction.options.getInteger("amount");
     let finalPrice;
 
@@ -93,7 +110,7 @@ module.exports = {
 
     // Create embed message
     const lotteryEmbed = new EmbedBuilder()
-      .setColor(hasWon ? "#FFD700" : "#FF0000") // Gold for win, Red for loss
+      .setColor(existingGuild.config.embedColor) // Gold for win, Red for loss
       .setTitle(hasWon ? "Lottery Result! 🎉" : "Lottery Result 💔")
       .setDescription(
         hasWon

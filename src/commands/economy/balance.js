@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const User = require("../../schemas/user");
+const Guild = require("../../schemas/guild");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,6 +15,22 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
+    try {
+      if (!existingGuild) {
+        const newGuild = new Guild({
+          guildId: interaction.guild.id,
+          config: {
+            embedColor: "#FFFFFF", // Default color
+          },
+        });
+
+        await newGuild.save();
+        console.log(`Guild ${interaction.guild.id} added to the database.`);
+      }
+    } catch (error) {
+      console.error(`Error adding guild to the database:`, error);
+    }
     try {
       const user = interaction.options.getUser("user") || interaction.user;
       let userData = await User.findOne({ userId: user.id });
@@ -26,7 +43,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle(`${user.username}'s Coins`)
         .setDescription(`${user.username} has ${userData.coins} coins.`)
-        .setColor("#FFD700");
+        .setColor(existingGuild.config.embedColor);
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
