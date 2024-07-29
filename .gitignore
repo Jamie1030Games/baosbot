@@ -25,4 +25,4 @@ patches
 
 .vs/
 
-eslint.config.mjs
+*.mjs
