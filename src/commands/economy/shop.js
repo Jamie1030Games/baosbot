@@ -17,7 +17,9 @@ module.exports = {
   async execute(interaction) {
     let itemExp;
     try {
-      const items = await Item.find();
+      // Fetch items and filter out items that are off sale
+      const items = await Item.find({ isOffSale: { $ne: 'true' } });
+
       if (items.length === 0) {
         return interaction.reply('No items available in the shop.');
       }
@@ -125,6 +127,14 @@ module.exports = {
               });
             }
 
+            // Check if user already has 3 items
+            if (user.items.length >= 3) {
+              return i.reply({
+                content: 'You cannot buy more than 3 items.',
+                ephemeral: true,
+              });
+            }
+
             user.coins -= item.price;
 
             const expirationDate = item.expirationDuration
@@ -144,12 +154,19 @@ module.exports = {
               newItem.multiplier = item.multiplier;
             } else if (item.type === 'luck_booster') {
               newItem.luckboost = item.luckboost;
+            } else if (item.type === 'no_tax') {
+              newItem.no_tax = item.no_tax;
             }
 
             user.items.push(newItem);
             await user.save();
 
-            if (expirationDate) {
+            // Check if there is already an active item with an expirationDate
+            const activeItem = user.items.some(
+              (userItem) => userItem.expirationDate && userItem.expirationDate > Date.now()
+            );
+
+            if (!activeItem && expirationDate) {
               setTimeout(async () => {
                 try {
                   const updatedUser = await User.findOne({

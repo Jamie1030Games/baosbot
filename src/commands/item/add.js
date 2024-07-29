@@ -33,6 +33,12 @@ module.exports = {
     )
     .addIntegerOption((option) =>
       option
+        .setName("notax")
+        .setDescription("The amount of transactions that aren't taxed")
+        .setRequired(true)
+    )
+    .addIntegerOption((option) =>
+      option
         .setName("price")
         .setDescription("Price of the item in coins")
         .setRequired(true)
@@ -44,6 +50,12 @@ module.exports = {
           "Type of the item (e.g., coin_multiplier, luck_booster)"
         )
         .setRequired(true)
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("unique")
+        .setDescription("If the item is unique (1 per member)")
+        .setRequired(true)
     ),
 
   async execute(interaction) {
@@ -52,6 +64,8 @@ module.exports = {
     const expirationDuration = interaction.options.getInteger("expiration");
     const price = interaction.options.getInteger("price");
     const type = interaction.options.getString("type");
+    const isUnique = interaction.options.getBoolean("unique");
+    const notaxAmt = interaction.options.getInteger("notax");
 
     const embed = new EmbedBuilder()
       .setColor("#00FF00")
@@ -61,6 +75,7 @@ module.exports = {
         { name: "Description", value: description },
         { name: "Expiration Duration", value: `${expirationDuration} ms` },
         { name: "Price", value: `${price} coins` },
+        { name: "Is Unique", value: `${isUnique}` },
         { name: "Type", value: type }
       )
       .setFooter({ text: "Please provide additional details." });
@@ -88,6 +103,7 @@ module.exports = {
       if (i.customId === "confirm") {
         let multiplier = 1;
         let luckBoost = 0;
+        let notax = 0;
 
         if (type === "coin_multiplier") {
           await i.channel.send("Please enter the multiplier value:");
@@ -111,6 +127,17 @@ module.exports = {
             errors: ["time"],
           });
           luckBoost = parseFloat(luckResponse.first().content);
+        } else if (type === "no_tax") {
+          await i.channel.send("Please enter the amount of no-tax transactions:");
+          const taxFilter = (response) =>
+            response.author.id === interaction.user.id;
+          const taxResponse = await interaction.channel.awaitMessages({
+            filter: taxFilter,
+            max: 1,
+            time: 60000,
+            errors: ["time"],
+          });
+          notax = parseFloat(taxResponse.first().content);
         }
 
         const newItem = new Item({
@@ -120,7 +147,9 @@ module.exports = {
           price,
           type,
           multiplier,
+          notax,
           luckBoost,
+          isUnique,
         });
 
         await newItem.save();

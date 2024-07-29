@@ -58,7 +58,7 @@ module.exports = {
         });
         await user.save();
       } else {
-        if (existingGuild.config.levelEnabled == 'true') {
+        if (existingGuild.config.levelEnabled == "true") {
           const lastMessageTimestamp = user.lastMessageTimestamp || 0;
 
           // Check if the cooldown period has passed
@@ -72,6 +72,7 @@ module.exports = {
 
             // Handle leveling up
             if (user.xp >= nextLevelXP) {
+              let currentUserLevel = user.level;
               user.level += 1;
               user.xp -= nextLevelXP; // Handle XP overflow
 
@@ -80,23 +81,7 @@ module.exports = {
 
               await user.save();
 
-              // Create and send the embed message
-              // const levelUpEmbed = new EmbedBuilder()
-              //   .setColor('#FFD700') // Gold color
-              //   .setTitle('🎉 Level Up! 🎉')
-              //   .setDescription(`Congratulations ${message.author}, you have leveled up!`)
-              //   .addFields(
-              //     { name: 'New Level', value: user.level.toString(), inline: true },
-              //     { name: 'XP Until Next Level', value: (calculateXpForNextLevel(user.level) - user.xp).toString(), inline: true },
-              //     { name: 'Coins Earned', value: nextLevelXP.toString(), inline: true }
-              //   )
-              //   .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
-              //   .setFooter({ text: 'Keep chatting to earn more XP and level up even further!' })
-              //   .setTimestamp();
-
-              const userStatus = message.member.presence?.status || "offline";
-
-              const levelUpEmbed = await new canvafy.Rank()
+              const levelUpEmbed = await new canvafy.LevelUp()
                 .setAvatar(
                   message.author.displayAvatarURL({
                     forceStatic: true,
@@ -108,15 +93,42 @@ module.exports = {
                   "https://www.designyourway.net/blog/wp-content/uploads/2018/11/pastel-background-goo-1536x864.jpg"
                 )
                 .setUsername(message.author.username)
-                .setBorder("#fff")
-                .setStatus(userStatus)
-                .setLevel(user.level)
-                .setCurrentXp(user.xp)
-                .setRequiredXp(nextLevelXP + 20)
+                .setBorder(existingGuild.config.embedColor)
+                .setAvatarBorder(existingGuild.config.embedColor)
+                .setOverlayOpacity(0.7)
+                .setLevels(currentUserLevel, user.level)
                 .build();
 
-              if (existingGuild.config.levelChannel && existingGuild.config.levelChannel != '0' && existingGuild.config.levelChannel != undefined && existingGuild.config.levelChannel != null) {
-                const levelChannel = client.channels.cache.get(existingGuild.config.levelChannel);
+              // const userStatus = message.member.presence?.status || "offline";
+
+              // const levelUpEmbed = await new canvafy.Rank()
+              //   .setAvatar(
+              //     message.author.displayAvatarURL({
+              //       forceStatic: true,
+              //       extension: "png",
+              //     })
+              //   )
+              //   .setBackground(
+              //     "image",
+              //     "https://www.designyourway.net/blog/wp-content/uploads/2018/11/pastel-background-goo-1536x864.jpg"
+              //   )
+              //   .setUsername(message.author.username)
+              //   .setBorder("#fff")
+              //   .setStatus(userStatus)
+              //   .setLevel(user.level)
+              //   .setCurrentXp(user.xp)
+              //   .setRequiredXp(nextLevelXP + 20)
+              //   .build();
+
+              if (
+                existingGuild.config.levelChannel &&
+                existingGuild.config.levelChannel != "0" &&
+                existingGuild.config.levelChannel != undefined &&
+                existingGuild.config.levelChannel != null
+              ) {
+                const levelChannel = client.channels.cache.get(
+                  existingGuild.config.levelChannel
+                );
                 await levelChannel.send({
                   content: `<@${message.author.id}> has leveled up!`,
                   files: [
@@ -126,7 +138,7 @@ module.exports = {
                     },
                   ],
                 });
-              } else if (existingGuild.config.levelChannel == '0') {
+              } else if (existingGuild.config.levelChannel == "0") {
                 await message.channel.send({
                   content: `<@${message.author.id}> has leveled up!`,
                   files: [

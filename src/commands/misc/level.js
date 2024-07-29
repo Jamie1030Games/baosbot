@@ -1,14 +1,14 @@
 // src/commands/tools/level.js
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
-const mongoose = require('mongoose');
-const UserSchema = require('../../schemas/user.js'); // Adjust the path as needed
-const Guild = require('../../schemas/guild.js'); // Adjust the path as needed
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const canvafy = require("canvafy");
+const mongoose = require("mongoose");
+const UserSchema = require("../../schemas/user.js"); // Adjust the path as needed
+const Guild = require("../../schemas/guild.js"); // Adjust the path as needed
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('level')
-    .setDescription('Display your level and XP information'),
+    .setName("level")
+    .setDescription("Display your level and XP information"),
 
   async execute(interaction) {
     const userId = interaction.user.id;
@@ -34,28 +34,54 @@ module.exports = {
 
       // Fetch embed color from the database
       const guild = await Guild.findOne({ guildId: interaction.guildId });
-      const embedColor = guild ? guild.config.embedColor : '#FFD700';
 
-      console.log(guild.config.embedColor);
+      // const embed = new EmbedBuilder()
+      //   .setColor(embedColor)
+      //   .setTitle(`🌟 ${interaction.user.username}'s Level`)
+      //   .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+      //   .setDescription('Here is your current level and XP status:')
+      //   .addFields(
+      //     { name: 'Level', value: `${user.level}`, inline: true },
+      //     { name: 'XP', value: `${user.xp}/${xpNeeded}`, inline: true },
+      //     { name: 'XP until next level', value: `${xpRemaining}`, inline: true }
+      //   )
+      //   .setFooter({ text: 'Keep chatting to level up!', iconURL: interaction.client.user.displayAvatarURL() })
+      //   .setTimestamp();
+      const userStatus = interaction.member.presence?.status || "offline";
 
-      const embed = new EmbedBuilder()
-        .setColor(embedColor)
-        .setTitle(`🌟 ${interaction.user.username}'s Level`)
-        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
-        .setDescription('Here is your current level and XP status:')
-        .addFields(
-          { name: 'Level', value: `${user.level}`, inline: true },
-          { name: 'XP', value: `${user.xp}/${xpNeeded}`, inline: true },
-          { name: 'XP until next level', value: `${xpRemaining}`, inline: true }
+      const levelUpEmbed = await new canvafy.Rank()
+        .setAvatar(
+          interaction.user.displayAvatarURL({
+            forceStatic: true,
+            extension: "png",
+          })
         )
-        .setFooter({ text: 'Keep chatting to level up!', iconURL: interaction.client.user.displayAvatarURL() })
-        .setTimestamp();
+        .setBackground(
+          "image",
+          "https://www.designyourway.net/blog/wp-content/uploads/2018/11/pastel-background-goo-1536x864.jpg"
+        )
+        .setUsername(interaction.user.username)
+        .setBorder("#fff")
+        .setStatus(userStatus)
+        .setBarColor(guild.config.embedColor)
+        .setLevel(user.level) 
+        .setCurrentXp(xpRemaining)
+        .setRequiredXp(xpNeeded + 20)
+        .build();
 
-      await interaction.reply({ embeds: [embed] });
-    } catch (error) {
-      console.error('Error fetching level data:', error);
       await interaction.reply({
-        content: 'An error occurred while fetching your level data. Please try again later.',
+        files: [
+          {
+            attachment: levelUpEmbed,
+            name: `rank-${interaction.user.id}.png`,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Error fetching level data:", error);
+      await interaction.reply({
+        content:
+          "An error occurred while fetching your level data. Please try again later.",
         ephemeral: true,
       });
     }

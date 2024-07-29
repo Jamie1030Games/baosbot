@@ -23,14 +23,14 @@ module.exports = {
 
     if (!existingGuild) {
       const newGuild = new Guild({
-        guildId: guild.id,
+        guildId: member.guild.id,
         config: {
           embedColor: "#FFFFFF", // Default color
         },
       });
 
       await newGuild.save();
-      console.log(`Guild ${guild.id} added to the database.`);
+      console.log(`Guild ${member.guild.id} added to the database.`);
     }
 
     if (existingGuild) {

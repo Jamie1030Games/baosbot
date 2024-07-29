@@ -27,7 +27,19 @@ module.exports = {
     ),
   async execute(interaction) {
     const target = interaction.options.getUser("target");
+    if (target.id == interaction.user.id) {
+      return interaction.reply({
+        content: "You can't transfer money to yourself idiot.",
+        ephemeral: true,
+      });
+    }
     const amount = interaction.options.getInteger("amount");
+    if (amount <= 0) {
+      return interaction.reply({
+        content: "You can't try and steal money from people, idiot.",
+        ephemeral: true,
+      });
+    }
     const tax = amount * TAX_RATE; // Calculate tax
     const amountAfterTax = amount - tax; // Amount to transfer after tax
 

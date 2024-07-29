@@ -1,11 +1,6 @@
 module.exports = {
   name: "error",
-  async execute(client) {
+  async execute(error) {
     console.error('An error occurred:', error);
-    try {
-        return;
-      } catch (error) {
-        console.error('Failed to catch error:', error);
-      }
   },
 };

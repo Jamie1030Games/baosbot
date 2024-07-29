@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
       multiplier: String,
       type: {
         type: String,
-        enum: ["coin_multiplier", "luck_booster", "other"],
+        enum: ["coin_multiplier", "luck_booster", "no_tax", "other"],
         required: true,
       },
       luckboost: String,
@@ -26,6 +26,16 @@ const userSchema = new mongoose.Schema({
     },
   ],
   lastDaily: { type: Number, default: 86400000 },
+  job: {
+    jobType: {
+      type: String,
+      default: 'none',
+    },
+    workExperience: {
+      type: Number,
+      default: 0,
+    },
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

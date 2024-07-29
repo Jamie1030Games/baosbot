@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 require("dotenv").config();
 const { token, databaseToken } = process.env;
 const { connect, mongoose } = require("mongoose");

@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const Guild = require("../../schemas/guild");
 const User = require("../../schemas/user");
 const canvafy = require("canvafy"); // Ensure canvafy is properly imported
 const mongoose = require("mongoose");
+const Guild = require('../../schemas/guild');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,20 +14,6 @@ module.exports = {
     let existingUser = await User.findOne({ userId: interaction.user.id });
 
     try {
-      if (!existingGuild) {
-        const newGuild = new Guild({
-          guildId: interaction.guild.id,
-          config: {
-            embedColor: "#FFFFFF", // Default color
-            verifyEnabled: true, // Ensure verifyEnabled is properly set
-            verifyChannel: null, // Set this accordingly
-          },
-        });
-
-        await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
-      }
-
       if (!existingUser) {
         existingUser = new User({
           _id: new mongoose.Types.ObjectId(),
