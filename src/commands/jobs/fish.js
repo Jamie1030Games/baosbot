@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // jobs/fish.js
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const {
@@ -13,6 +14,7 @@ const User = require("../../schemas/user");
 const Guild = require("../../schemas/guild");
 const mongoose = require("mongoose");
 const handleCoins = require("../../middleware/coinAdder");
+const { deleteMessageAfterTimeout } = require('../../middleware/deleteMessage'); 
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -75,7 +77,7 @@ module.exports = {
         .setStyle(ButtonStyle.Primary)
     );
 
-    const message = await interaction.reply({
+    let fishMessage = await interaction.reply({
       embeds: [embed],
       components: [row],
       files: [{ attachment: standingImage, name: "standing.png" }],
@@ -84,7 +86,7 @@ module.exports = {
 
     const filter = (i) =>
       i.customId === "startFishing" && i.user.id === interaction.user.id;
-    const collector = message.createMessageComponentCollector({
+    const collector = fishMessage.createMessageComponentCollector({
       filter,
       componentType: ComponentType.Button,
       time: 15000,
@@ -116,10 +118,10 @@ module.exports = {
           const finalPrice = await handleCoins(interaction.user.id, fishValue);
           const multiplier = (finalPrice / fishValue).toFixed(2);
 
-          let multi = '';
-            if (finalPrice > fishValue) {
-                multi = ` (${finalPrice} with your active multiplier of ${multiplier})`
-            }
+          let multi = "";
+          if (finalPrice > fishValue) {
+            multi = ` (${finalPrice} with your active multiplier of ${multiplier})`;
+          }
 
           await i.editReply({
             embeds: [
@@ -136,16 +138,7 @@ module.exports = {
 
           user.coins += finalPrice;
           await user.save();
-
-          // Here you would update the user's coins in the database
-          // Assuming you have a User model and coins field
-          /*
-          const user = await User.findOne({ userId: interaction.user.id });
-          if (user) {
-            user.coins += fishValue;
-            await user.save();
-          }
-          */
+          deleteMessageAfterTimeout(fishMessage, 5000);
         }, 5000);
       }
     });

@@ -20,3 +20,9 @@ dist/
 # Temporary files
 tmp/
 temp/
+
+patches
+
+.vs
+
+eslint.config.mjs
