@@ -1,5 +1,7 @@
 const { readdirSync } = require('fs');
 const path = require('path');
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 module.exports = (client) => {
   client.handleComponents = async () => {
@@ -19,10 +21,10 @@ module.exports = (client) => {
               if (button.data && button.data.name) {
                 buttons.set(button.data.name, button);
               } else {
-                console.warn(`Skipping file ${file}: Missing data.name`);
+                consola.warn(c.yellow(`Skipping file ${file}: Missing data.name`));
               }
             } catch (error) {
-              console.error(`Error loading button ${file}:`, error);
+              consola.error(c.red(`Error loading button ${file}:`, error));
             }
           }
           break;
@@ -34,10 +36,10 @@ module.exports = (client) => {
               if (menu.customId && typeof menu.execute === 'function') {
                 selectMenus.set(menu.customId, menu);
               } else {
-                console.warn(`Skipping file ${file}: Missing customId or execute function`);
+                consola.warn(c.yellow(`Skipping file ${file}: Missing customId or execute function`));
               }
             } catch (error) {
-              console.error(`Error loading select menu ${file}:`, error);
+              consola.error(c.red(`Error loading select menu ${file}:`, error));
             }
           }
           break;

@@ -1,7 +1,8 @@
 // middleware/muteMiddleware.js
-
 const { PermissionsBitField } = require("discord.js");
 const Guild = require("../schemas/guild");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 module.exports = async function muteMiddleware(
   interaction,
@@ -31,7 +32,6 @@ module.exports = async function muteMiddleware(
       });
 
       await newGuild.save();
-      console.log(`Guild ${interaction.guild.id} added to the database.`);
     }
 
     // Get the mute role
@@ -68,7 +68,7 @@ module.exports = async function muteMiddleware(
       });
     }
   } catch (error) {
-    console.error("Error muting user:", error);
+    consola.error(c.red("Error muting user:" + error));
     if (isNew != true) {
         await interaction.reply({
             content: "There was an error while trying to mute the user.",

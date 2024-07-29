@@ -1,5 +1,7 @@
 const canvafy = require("canvafy");
 const Guild = require("../../schemas/guild");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 module.exports = {
   name: "guildMemberRemove",
@@ -30,7 +32,6 @@ module.exports = {
       });
 
       await newGuild.save();
-      console.log(`Guild ${member.guild.id} added to the database.`);
     }
 
     if (existingGuild) {
@@ -52,7 +53,7 @@ module.exports = {
             })
             .catch(console.error); // Handle any potential errors
         } else {
-          console.error("Welcome channel not found.");
+          consola.error(c.red("Welcome channel not found."));
         }
       }
     }

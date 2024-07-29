@@ -42,8 +42,8 @@ for (const folder of functionFolders) {
     if (typeof func === "function") {
       func(client); // Call the function with client if it's valid
     } else {
-      console.error(
-        `The file ${file} in folder ${folder} does not export a function.`
+      consola.error(
+        c.red(`The file ${file} in folder ${folder} does not export a function.`)
       );
     }
   }
@@ -51,25 +51,25 @@ for (const folder of functionFolders) {
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
+  consola.error(c.red("Uncaught Exception:" + error));
 });
 
 // Graceful shutdown
 process.on("SIGINT", () => {
-  console.log("Bot is shutting down... due to sigint");
+  consola.log(c.red("Bot is shutting down... due to sigint"));
   client.destroy();
   process.exit();
 });
 
 process.on("SIGTERM", () => {
-  console.log("Bot is shutting down... due to sigterm");
+  a.log(c.red("Bot is shutting down... due to sigterm"));
   client.destroy();
   process.exit();
 });
 
 // Handling unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  consola.error(c.red("Unhandled Rejection at:", promise, "reason:", reason));
 });
 
 mongoose.set("strictQuery", false);
@@ -79,6 +79,6 @@ client.handleCommands();
 client.handleComponents();
 client.login(token);
 (async () => {
-  await connect(databaseToken).catch((error) => console.error(error));
+  await connect(databaseToken).catch((error) => consola.error(c.red(error)));
   consola.box(c.bgWhite("bao's bot is online"));
 })();

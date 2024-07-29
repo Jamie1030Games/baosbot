@@ -1,5 +1,7 @@
 // functions/handleCoins.js
 const User = require("../schemas/user");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 async function handleCoins(userId, baseAmount) {
   try {
@@ -34,7 +36,7 @@ async function handleCoins(userId, baseAmount) {
 
     return finalAmount;
   } catch (error) {
-    console.error("Error handling coin calculation:", error.message);
+    consola.error(c.red("Error handling coin calculation:" + error.message));
     throw error;
   }
 }

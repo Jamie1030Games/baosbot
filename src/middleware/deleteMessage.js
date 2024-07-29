@@ -1,4 +1,7 @@
 // utils.js
+const { consola } = require("consola");
+const c = require('ansi-colors');
+
 module.exports = {
     deleteMessageAfterTimeout: async (message, timeout) => {
       try {
@@ -6,13 +9,12 @@ module.exports = {
         setTimeout(async () => {
           try {
             await message.delete();
-            console.log('Message deleted.');
           } catch (error) {
-            console.error('Failed to delete message:', error);
+            consola.error(c.red('Failed to delete message:' + error));
           }
         }, timeout);
       } catch (error) {
-        console.error('Error setting timeout:', error);
+        consola.error(c.red('Error setting timeout:' + error));
       }
     }
   };

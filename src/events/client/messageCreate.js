@@ -3,6 +3,8 @@ const UserSchema = require("../../schemas/user"); // Adjust the path as necessar
 const canvafy = require("canvafy");
 const Guild = require("../../schemas/guild");
 const { ChannelType } = require("discord.js");
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 const XP_AMOUNT = 10; // Amount of XP to add per message
 const COOLDOWN = 0.000001 * 1000; // Cooldown period in milliseconds (5 seconds)
@@ -32,15 +34,14 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${message.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     try {
       // Ensure that UserSchema is correctly defined
       if (!UserSchema || !UserSchema.findOne) {
-        console.error("UserSchema is not correctly defined or imported.");
+        consola.error(c.red("UserSchema is not correctly defined or imported."));
         return;
       }
 
@@ -152,15 +153,11 @@ module.exports = {
             } else {
               await user.save(); // Save updated user data if no level up
             }
-
-            console.log(
-              `User ${message.author.tag} has ${user.xp} XP in total. This level takes ${nextLevelXP}.`
-            );
           }
         }
       }
     } catch (error) {
-      console.error("Error updating XP:", error);
+      consola.error(c.red("Error updating XP:" + error));
     }
   },
 };

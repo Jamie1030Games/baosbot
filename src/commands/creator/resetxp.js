@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const User = require('../../schemas/user'); // Adjust the path as necessary
+const consola = require('consola');
+const c = require('ansi-colors');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -26,7 +28,7 @@ module.exports = {
 
       return interaction.reply({ content: `${targetUser.username}'s levels and XP have been reset.`, ephemeral: true });
     } catch (error) {
-      console.error(error);
+      consola.error(c.red(error));
       return interaction.reply({ content: 'An error occurred while resetting the user\'s levels and XP.', ephemeral: true });
     }
   },

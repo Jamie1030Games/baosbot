@@ -1,3 +1,6 @@
+const { consola } = require("consola");
+const c = require('ansi-colors');
+
 module.exports = {
   name: "interactionCreate",
   async execute(interaction, client) {
@@ -10,7 +13,7 @@ module.exports = {
       try {
         await command.execute(interaction, client);
       } catch (error) {
-        console.error(error);
+        consola.error(c.red(error));
         await interaction.reply({
           content: `Something went totally wrong while doing that, hun.`,
           ephemeral: true,
@@ -25,7 +28,7 @@ module.exports = {
       try {
         await button.execute(interaction, client);
       } catch (error) {
-        console.error(error);
+        consola.error(c.red(error));
       }
     } else if (interaction.isStringSelectMenu()) {
       const { selectMenus } = client;
@@ -35,7 +38,7 @@ module.exports = {
       try {
         await menu.execute(interaction, client);
       } catch (error) {
-        console.error(error);
+        consola.error(c.red(error));
       }
     }
   },

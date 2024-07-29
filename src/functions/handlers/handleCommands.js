@@ -44,7 +44,7 @@ module.exports = (client) => {
         }
       }
     } catch (error) {
-      consola.error(c.red("Error refreshing application commands:", error));
+      consola.error(c.red("Error refreshing application commands:" + error));
     }
   };
 

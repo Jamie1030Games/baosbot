@@ -1,4 +1,6 @@
 const Guild = require('../../schemas/guild');
+const { consola } = require("consola");
+const c = require('ansi-colors');
 
 module.exports = {
     name: 'guildCreate',
@@ -15,10 +17,10 @@ module.exports = {
                 });
 
                 await newGuild.save();
-                console.log(`Guild ${guild.id} added to the database.`);
+                consola.log(c.red(`Guild ${guild.id} added to the database.`));
             }
         } catch (error) {
-            console.error(`Error adding guild ${guild.id} to the database:`, error);
+            consola.error(c.red(`Error adding guild ${guild.id} to the database:`, error));
         }
     },
 };

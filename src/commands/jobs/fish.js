@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-// jobs/fish.js
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { consola } = require("consola");
 const c = require('ansi-colors');
@@ -16,7 +15,7 @@ const User = require("../../schemas/user");
 const Guild = require("../../schemas/guild");
 const mongoose = require("mongoose");
 const handleCoins = require("../../middleware/coinAdder");
-const { deleteMessageAfterTimeout } = require('../../middleware/deleteMessage'); 
+const { deleteMessageAfterTimeout } = require('../../middleware/deleteMessage');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -35,12 +34,12 @@ module.exports = {
           coins: 0,
           level: 1,
           xp: 0,
-          lastMessageTimestamp: now,
+          lastMessageTimestamp: Date.now(),
         });
         await user.save();
       }
     } catch (error) {
-      consola.error(c.red(`Error adding guild to the database:`, error));
+      consola.error(c.red(`Error adding user to the database:`, error));
     }
 
     let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
@@ -58,12 +57,15 @@ module.exports = {
     } catch (error) {
       consola.error(c.red(`Error adding guild to the database:`, error));
     }
+
     const imagesDir = path.join(__dirname, "..", "images");
-    const standingImage = fs.readFileSync(path.join(imagesDir, "standing.png"));
-    const isFishingImage = fs.readFileSync(
-      path.join(imagesDir, "isFishing.png")
-    );
-    const caughtImage = fs.readFileSync(path.join(imagesDir, "caught.png"));
+
+    // Load all images from the directory
+    const imageFiles = fs.readdirSync(imagesDir).filter(file => file.endsWith('.png'));
+    const images = {};
+    imageFiles.forEach(file => {
+      images[file] = fs.readFileSync(path.join(imagesDir, file));
+    });
 
     const embed = new EmbedBuilder()
       .setTitle("Fishing")
@@ -81,7 +83,7 @@ module.exports = {
     let fishMessage = await interaction.reply({
       embeds: [embed],
       components: [row],
-      files: [{ attachment: standingImage, name: "standing.png" }],
+      files: [{ attachment: images["standing.png"], name: "standing.png" }],
       fetchReply: true,
     });
 
@@ -106,7 +108,7 @@ module.exports = {
               .setImage("attachment://isFishing.png"),
           ],
           components: [],
-          files: [{ attachment: isFishingImage, name: "isFishing.png" }],
+          files: [{ attachment: images["isFishing.png"], name: "isFishing.png" }],
         });
 
         setTimeout(async () => {
@@ -124,6 +126,11 @@ module.exports = {
             multi = ` (${finalPrice} with your active multiplier of ${multiplier})`;
           }
 
+          // Randomly select a caught image
+          const caughtImages = Object.keys(images).filter(file => file.startsWith('caught'));
+          const randomCaughtImage = caughtImages[Math.floor(Math.random() * caughtImages.length)];
+          const caughtImgUrl = `attachment://${randomCaughtImage}`;
+
           await i.editReply({
             embeds: [
               new EmbedBuilder()
@@ -132,9 +139,9 @@ module.exports = {
                 .setDescription(
                   `You caught a ${fishName} worth ${fishValue} coins${multi}!`
                 )
-                .setImage("attachment://caught.png"),
+                .setImage(caughtImgUrl),
             ],
-            files: [{ attachment: caughtImage, name: "caught.png" }],
+            files: [{ attachment: images[randomCaughtImage], name: randomCaughtImage }],
           });
 
           user.coins += finalPrice;
