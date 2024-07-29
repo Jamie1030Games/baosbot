@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { readdirSync } = require('fs');
 const path = require('path');
 const { consola } = require("consola");

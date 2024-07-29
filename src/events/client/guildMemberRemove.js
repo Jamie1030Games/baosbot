@@ -5,7 +5,7 @@ const c = require('ansi-colors');
 
 module.exports = {
   name: "guildMemberRemove",
-  async execute(member, client) {
+  async execute(member) {
     const welcome = await new canvafy.WelcomeLeave()
       .setAvatar(
         member.user.displayAvatarURL({ forceStatic: true, extension: "png" })
