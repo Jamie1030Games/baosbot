@@ -31,8 +31,7 @@ module.exports = {
         await user.save();
       }
 
-      const xpNeeded = user.level * 20; // XP needed for next level
-      const xpRemaining = xpNeeded - user.xp; // XP remaining to level up
+      const xpNeeded = user.level * 20 + 30; // XP needed for next level
 
       // Fetch embed color from the database
       const guild = await Guild.findOne({ guildId: interaction.guildId });
@@ -67,8 +66,8 @@ module.exports = {
         .setStatus(userStatus)
         .setBarColor(guild.config.embedColor)
         .setLevel(user.level) 
-        .setCurrentXp(xpRemaining)
-        .setRequiredXp(xpNeeded + 20)
+        .setCurrentXp(user.xp)
+        .setRequiredXp(xpNeeded)
         .build();
 
       await interaction.reply({
