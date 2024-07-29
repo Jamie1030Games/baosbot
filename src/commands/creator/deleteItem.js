@@ -49,7 +49,7 @@ module.exports = {
         ephemeral: true,
       });
     } catch (error) {
-      console.error('Error removing item:', error);
+      consola.error(c.red('Error removing item:' + error));
       return interaction.reply({
         content: 'An error occurred while removing the item.',
         ephemeral: true,

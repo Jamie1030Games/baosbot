@@ -103,13 +103,11 @@ module.exports = {
         if (userCaptchaResponse === captchaData) {
           await interaction.user.send("Correct. You may now access the server.");
           existingUser.isVerified = "true";
-          console.log(existingGuild.config.verifyRole);
           const member = await interaction.guild.members.fetch(
             interaction.user.id
           );
           await member.roles.add(existingGuild.config.verifyRole);
           existingUser.save();
-          console.log(existingUser.isVerified);
         } else {
           await interaction.user.send("Incorrect. Please try again for a new prompt.");
         }
@@ -120,7 +118,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.error(`Error handling captcha verification:`, error);
+      consola.error(c.red(`Error handling captcha verification:`, error));
       await interaction.reply({
         content: "An error occurred while verifying captcha.",
         ephemeral: true,

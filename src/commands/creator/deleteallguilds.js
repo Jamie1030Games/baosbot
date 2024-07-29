@@ -20,7 +20,7 @@ module.exports = {
       await Guild.deleteMany({});
       await interaction.reply("All guilds have been deleted from the database.");
     } catch (error) {
-      console.error("Error deleting all guilds:", error);
+      consola.error(c.red('Error deleting all guilds:' + error));
       await interaction.reply("There was an error deleting all guilds from the database.");
     }
   },

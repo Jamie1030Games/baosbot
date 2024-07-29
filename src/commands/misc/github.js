@@ -31,7 +31,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [githubEmbed] });
     } catch (error) {
-      console.error('Error fetching guild config or sending embed:', error);
+      consola.error(c.red('Error fetching guild config or sending embed:' + error));
       await interaction.reply({
         content: 'An error occurred while processing your request.',
         ephemeral: true,

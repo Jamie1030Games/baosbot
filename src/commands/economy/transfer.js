@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { consola } = require("consola");
-const c = require('ansi-colors');
+const c = require("ansi-colors");
 const {
   EmbedBuilder,
   ButtonBuilder,
@@ -41,10 +41,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const target = interaction.options.getUser("target");
     if (target.id == interaction.user.id) {
@@ -178,8 +177,8 @@ module.exports = {
         try {
           await target.send({ embeds: [dmEmbed] });
         } catch (error) {
-          console.error(
-            `Could not send DM to ${target.username}: ${error.message}`
+          consola.error(
+            c.red(`Could not send DM to ${target.username}: ${error.message}`)
           );
         }
 

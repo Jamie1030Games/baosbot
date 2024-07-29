@@ -22,10 +22,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     try {
       const items = await Item.find();
@@ -48,7 +47,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.error('Error listing items:', error);
+      consola.error(c.red('Error listing items:' + error));
       await interaction.reply('An error occurred while listing the items.');
     }
   },

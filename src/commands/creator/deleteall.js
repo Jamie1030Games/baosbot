@@ -51,7 +51,7 @@ module.exports = {
 
           await i.update({ embeds: [successEmbed], components: [] });
         } catch (error) {
-          console.error('Error deleting all user accounts:', error);
+          consola.error(c.red('Error deleting all user accounts:' + error));
 
           const errorEmbed = new EmbedBuilder()
             .setColor('#FF0000')

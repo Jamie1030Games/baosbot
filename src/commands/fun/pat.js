@@ -25,10 +25,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
         const target = interaction.options.getUser('target');
         const patGIF = 'https://i.giphy.com/xUA7bahIfcCqC7S4qA.webp'; // Example GIF URL

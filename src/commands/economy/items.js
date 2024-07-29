@@ -28,10 +28,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const user = await User.findOne({ userId: interaction.user.id });
 
@@ -67,10 +66,6 @@ module.exports = {
         .setDescription("Here are the items you currently have:")
         .setFooter({ text: `Page ${page + 1} of ${totalPages}` });
 
-      user.items.forEach((item) => {
-        console.log(timeUntil(item.expirationDate));
-      });
-
       currentItems.forEach((item) => {
         const expirationDate = item.expirationDate
           ? timeUntil(item.expirationDate)
@@ -80,7 +75,6 @@ module.exports = {
           value: `Effect: ${item.description}\nExpires: ${expirationDate}`,
           inline: false,
         });
-        console.log(item.notaxAmt);
       });
 
 

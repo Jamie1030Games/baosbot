@@ -30,10 +30,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const target = interaction.options.getUser('target');
     const amount = interaction.options.getInteger('amount');
@@ -61,7 +60,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [successEmbed] });
     } catch (error) {
-      console.error('Error removing coins:', error);
+      consola.error(c.red('Error removing coins:' + error));
 
       const errorEmbed = new EmbedBuilder()
         .setColor(existingGuild.config.embedColor)

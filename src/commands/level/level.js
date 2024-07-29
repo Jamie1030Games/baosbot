@@ -80,7 +80,7 @@ module.exports = {
         ],
       });
     } catch (error) {
-      console.error("Error fetching level data:", error);
+      consola.error(c.red('Error fetching level data:' + error));
       await interaction.reply({
         content:
           "An error occurred while fetching your level data. Please try again later.",

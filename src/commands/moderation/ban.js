@@ -36,7 +36,7 @@ module.exports = {
       // Respond with a success message
       return interaction.reply({ content: `Successfully banned ${user.tag}. Reason: ${reason}`, ephemeral: true });
     } catch (error) {
-      console.error('Error banning user:', error);
+      consola.error(c.red('Error banning user:' + error));
       return interaction.reply({ content: 'There was an error while trying to ban the user.', ephemeral: true });
     }
   },

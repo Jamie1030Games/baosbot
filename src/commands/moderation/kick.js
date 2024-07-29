@@ -36,7 +36,7 @@ module.exports = {
       // Respond with a success message
       return interaction.reply({ content: `Successfully kicked ${user.tag}. Reason: ${reason}`, ephemeral: true });
     } catch (error) {
-      console.error('Error kicking user:', error);
+      consola.error(c.red('Error kicking user:' + error));
       return interaction.reply({ content: 'There was an error while trying to kick the user.', ephemeral: true });
     }
   },

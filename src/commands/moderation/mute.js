@@ -34,7 +34,6 @@ module.exports = {
       });
 
       await newGuild.save();
-      console.log(`Guild ${interaction.guild.id} added to the database.`);
     }
 
     // Check if the user has the right permissions

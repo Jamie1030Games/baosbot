@@ -22,10 +22,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const url = 'https://meme-api.com/gimme';
 
@@ -45,7 +44,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.error('Error fetching meme:', error);
+      consola.error(c.red('Error fetching meme:' + error));
       await interaction.reply('An error occurred while fetching a meme.');
     }
   },

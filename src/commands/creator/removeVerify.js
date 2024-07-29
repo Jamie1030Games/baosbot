@@ -52,7 +52,7 @@ module.exports = {
         ephemeral: true,
       });
     } catch (error) {
-      console.error('Error removing verification status:', error);
+      consola.error(c.red('Error removing verification status:' + error));
       return interaction.reply({
         content: 'There was an error while trying to remove the verification status.',
         ephemeral: true,

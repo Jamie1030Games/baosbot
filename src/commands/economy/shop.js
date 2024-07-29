@@ -29,10 +29,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     let embedUnique;
     let itemExp;
@@ -52,9 +51,8 @@ module.exports = {
         const item = items[page];
         try {
           itemExp = convertMilliseconds(item.expirationDuration);
-          console.log(`Converted successfully: ${item.expirationDuration}`);
         } catch (error) {
-          console.error(error.message);
+          consola.error(c.red(error.message));
         }
 
         if (item.isUnique == 'true') {
@@ -161,20 +159,11 @@ module.exports = {
               (item) => item.name === "Pet Turtle"
             ).length;
 
-            // Log the pet turtle count for debugging
-            console.log(`Pet Turtle Count: ${petTurtleCount}`);
-
             // Check if the user already has a unique item
             const hasUnique = user.items.some(
               (existingItem) =>
                 existingItem.isUnique === "true" &&
                 existingItem.name === item.name
-            );
-
-            // Log the `hasUnique` result for debugging
-            console.log(`Has Unique: ${hasUnique}`);
-            console.log(
-              `Current Item: ${item.name}, isUnique: ${item.isUnique}`
             );
 
             if (petTurtleCount >= 3 && item.name === "Pet Turtle") {
@@ -246,7 +235,7 @@ module.exports = {
                     await updatedUser.save();
                   }
                 } catch (error) {
-                  console.error("Error removing expired item:", error);
+                  consola.error(c.red('Error removing expired item:' + error));
                 }
               }, item.expirationDuration);
             }
@@ -285,7 +274,7 @@ module.exports = {
             components: generateComponents(page),
           });
         } catch (error) {
-          console.error("Error handling interaction:", error);
+          consola.error(c.red('Error handling interaction:' + error));
           if (error.code === 10008) {
             await i.reply({
               content:
@@ -307,7 +296,7 @@ module.exports = {
         });
       });
     } catch (error) {
-      console.error("Error executing shop command:", error);
+      consola.error(c.red('Error executing shop command:' + error));
       await interaction.reply({
         content: "An error occurred while processing the shop command.",
         ephemeral: true,

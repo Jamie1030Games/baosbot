@@ -22,10 +22,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const url = 'https://uselessfacts.jsph.pl/random.json?language=en';
 
@@ -46,7 +45,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.error('Error fetching fact:', error);
+      consola.error(c.red('Error fetching fact:' + error));
       await interaction.reply('Failed to fetch a fact. Please try again later.');
     }
   },

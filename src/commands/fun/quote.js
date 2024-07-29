@@ -22,10 +22,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const url = 'https://api.quotable.io/random'; // Quotable API endpoint
 
@@ -52,7 +51,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.error('Error fetching quote:', error.message);
+      consola.error(c.red('Error fetching quote:' + error.message));
       await interaction.reply('Failed to fetch a quote. Please try again later.');
     }
   },

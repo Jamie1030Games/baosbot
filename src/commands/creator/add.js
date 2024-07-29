@@ -68,10 +68,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        consola.info(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
@@ -166,7 +165,6 @@ module.exports = {
         });
 
         await newItem.save();
-        console.log(newItem.notaxAmt)
         await i.channel.send(
           `Item **${name}** has been added to the shop with the following details:\nMultiplier: ${multiplier}\nLuck Boost: ${luckBoost}%`
         );

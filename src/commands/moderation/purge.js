@@ -38,7 +38,7 @@ module.exports = {
       // Respond with a success message
       return interaction.reply({ content: `Successfully deleted ${amount} message(s).`, ephemeral: true });
     } catch (error) {
-      console.error('Error deleting messages:', error);
+      consola.error(c.red('Error deleting messages:' + error));
       return interaction.reply({ content: 'There was an error while trying to delete messages.', ephemeral: true });
     }
   },

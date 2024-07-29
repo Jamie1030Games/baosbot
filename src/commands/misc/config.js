@@ -70,7 +70,7 @@ module.exports = {
             components: [row],
           });
         } catch (error) {
-          console.error(error);
+          consola.error(c.red(error));
         }
       } else if (i.customId === "set") {
         await handleSetting(interaction, settings[currentIndex], guildId);
@@ -88,7 +88,7 @@ module.exports = {
       try {
         message.edit({ components: [] });
       } catch (error) {
-        console.error(error);
+        consola.error(c.red(error));
       }
     });
   },

@@ -40,7 +40,7 @@ module.exports = {
         await user.save();
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
 
     let existingGuild = await Guild.findOne({ guildId: interaction.guild.id });
@@ -54,10 +54,9 @@ module.exports = {
         });
 
         await newGuild.save();
-        console.log(`Guild ${interaction.guild.id} added to the database.`);
       }
     } catch (error) {
-      console.error(`Error adding guild to the database:`, error);
+      consola.error(c.red(`Error adding guild to the database:`, error));
     }
     const imagesDir = path.join(__dirname, "..", "images");
     const standingImage = fs.readFileSync(path.join(imagesDir, "standing.png"));
