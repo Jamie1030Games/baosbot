@@ -57,7 +57,7 @@ module.exports = {
       }
 
       // Validate and update the field
-      const validFields = ['description', 'price', 'expirationDuration', 'multiplier', 'luckBoost', 'type', 'isUnique', 'isOffSale', 'deal.percentOff', 'deal.hasDeal'];
+      const validFields = ['name', 'description', 'price', 'expirationDuration', 'multiplier', 'luckBoost', 'type', 'isUnique', 'isOffSale', 'deal.percentOff', 'deal.hasDeal'];
       if (!validFields.includes(field)) {
         return interaction.reply({
           content: `Invalid field "${field}". Valid fields are ${validFields.join(', ')}.`,

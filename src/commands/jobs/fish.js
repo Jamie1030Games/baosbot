@@ -146,7 +146,7 @@ module.exports = {
 
           user.coins += finalPrice;
           await user.save();
-          deleteMessageAfterTimeout(fishMessage, 5000);
+          deleteMessageAfterTimeout(fishMessage, 7500);
         }, 5000);
       }
     });

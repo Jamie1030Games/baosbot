@@ -13,6 +13,15 @@ module.exports = {
     .setDescription("Display your level and XP information"),
 
   async execute(interaction) {
+    const guild = await Guild.findOne({ guildId: interaction.guildId });
+
+    if (guild.config.levelEnabled == 'false') {
+      interaction.reply({
+        content: 'Leveling is not enabled on this server.',
+        ephemeral: true,
+      })
+    }
+
     const userId = interaction.user.id;
 
     try {
@@ -34,8 +43,6 @@ module.exports = {
       const xpNeeded = user.level * 20 + 30; // XP needed for next level
 
       // Fetch embed color from the database
-      const guild = await Guild.findOne({ guildId: interaction.guildId });
-
       // const embed = new EmbedBuilder()
       //   .setColor(embedColor)
       //   .setTitle(`🌟 ${interaction.user.username}'s Level`)

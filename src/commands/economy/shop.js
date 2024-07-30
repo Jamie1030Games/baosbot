@@ -61,6 +61,17 @@ module.exports = {
           embedUnique = 'No (stacks)';
         }
 
+        let itemNumber;
+        if (item.type == 'coin_multiplier') {
+          itemNumber = item.multiplier + 'x';
+        } else if (item.type == 'luck_booster') {
+          itemNumber = item.luckBoost + '%';
+        } else if (item.type == 'no_tax') {
+          itemNumber = item.notaxAmt + 'x';
+        } else {
+          itemNumber = 'none';
+        }
+
         const embed = new EmbedBuilder()
           .setColor(existingGuild.config.embedColor)
           .setTitle(item.name)
@@ -68,7 +79,7 @@ module.exports = {
           .addFields(
             {
               name: "Effect",
-              value: item.type || "No effect",
+              value: item.type + ` (${itemNumber})` || "No effect",
             },
             {
               name: "Price",
