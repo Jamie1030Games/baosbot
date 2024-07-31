@@ -14,11 +14,14 @@ const itemSchema = new mongoose.Schema({
   multiplier: { type: Number, default: 1 },
   luckBoost: { type: Number, default: 0 },
   notaxAmt: { type: Number, default: 0 },
-  isUnique: { type: String, default: "false" },
   isOffSale: { type: String, default: "false" },
   deal: {
     percentOff: { type: String, default: '0' },
     hasDeal: { type: String, default: "false" },
+  },
+  limit: {
+    type: Number,
+    default: 0,
   },
 });
 

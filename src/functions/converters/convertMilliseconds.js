@@ -26,6 +26,7 @@ function convertMilliseconds(ms) {
   if (seconds > 0) timeComponents.push(`${seconds} second${seconds > 1 ? 's' : ''}`);
   if (ms > 0) timeComponents.push(`${ms} millisecond${ms > 1 ? 's' : ''}`);
 
+  
   return timeComponents.join(', ');
 }
 

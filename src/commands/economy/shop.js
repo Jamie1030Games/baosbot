@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { consola } = require("consola");
-const c = require('ansi-colors');
+const c = require("ansi-colors");
 const {
   EmbedBuilder,
   ActionRowBuilder,
@@ -12,6 +12,10 @@ const Item = require("../../schemas/item");
 const User = require("../../schemas/user");
 const convertMilliseconds = require("../../functions/converters/convertMilliseconds.js");
 const Guild = require("../../schemas/guild.js");
+const checkItemLimit = require("../../middleware/checkItemLimit");
+const addItemToUser = require('../../middleware/addItem.js');
+const handleExpiration = require("../../middleware/handleExpiration");
+let itemLimitPrompt;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -33,7 +37,6 @@ module.exports = {
     } catch (error) {
       consola.error(c.red(`Error adding guild to the database:`, error));
     }
-    let embedUnique;
     let itemExp;
     try {
       // Fetch items and filter out items that are off sale
@@ -55,21 +58,10 @@ module.exports = {
           consola.error(c.red(error.message));
         }
 
-        if (item.isUnique == 'true') {
-          embedUnique = 'Yes (only 1)';
-        } else if (item.isUnique == 'false') {
-          embedUnique = 'No (stacks)';
-        }
-
-        let itemNumber;
-        if (item.type == 'coin_multiplier') {
-          itemNumber = item.multiplier + 'x';
-        } else if (item.type == 'luck_booster') {
-          itemNumber = item.luckBoost + '%';
-        } else if (item.type == 'no_tax') {
-          itemNumber = item.notaxAmt + 'x';
-        } else {
-          itemNumber = 'none';
+        if (item.limit >= 1) {
+          itemLimitPrompt = `Up to ${item.limit}.`;
+        } else if (item.limit <= 0) {
+          itemLimitPrompt = 'No limit.';
         }
 
         const embed = new EmbedBuilder()
@@ -79,15 +71,15 @@ module.exports = {
           .addFields(
             {
               name: "Effect",
-              value: item.type + ` (${itemNumber})` || "No effect",
+              value: item.type || "No effect",
             },
             {
               name: "Price",
               value: `${item.price} coins`,
             },
             {
-              name: "Unique Item",
-              value: `${embedUnique}`,
+              name: "Item Limit",
+              value: `${itemLimitPrompt}`,
             },
             {
               name: "Expiration",
@@ -166,90 +158,21 @@ module.exports = {
               });
             }
 
-            const petTurtleCount = user.items.filter(
-              (item) => item.name === "Pet Turtle"
-            ).length;
-
-            // Check if the user already has a unique item
-            const hasUnique = user.items.some(
-              (existingItem) =>
-                existingItem.isUnique === "true" &&
-                existingItem.name === item.name
+            const isLimitExceeded = await checkItemLimit(
+              interaction.user.id,
+              item.name
             );
-
-            if (petTurtleCount >= 3 && item.name === "Pet Turtle") {
+            if (isLimitExceeded) {
               return i.reply({
-                content: "You cannot buy more than 3 Pet Turtles.",
-                ephemeral: true,
-              });
-            }
-
-            if (item.isUnique === "true" && hasUnique) {
-              return i.reply({
-                content:
-                  "This item is unique. You may only have one at a time.",
+                content: `You cannot buy more than ${item.limit} of ${item.name}.`,
                 ephemeral: true,
               });
             }
 
             user.coins -= item.price;
 
-            const expirationDate = item.expirationDuration
-              ? Date.now() + item.expirationDuration
-              : null;
-
-            const newItem = {
-              name: item.name,
-              description: item.description,
-              multiplier: item.multiplier,
-              luckboost: item.luckBoost,
-              type: item.type,
-              expirationDate,
-              isUnique: item.isUnique,
-            };
-
-            if (item.type === "coin_multiplier") {
-              newItem.multiplier = item.multiplier;
-            } else if (item.type === "luck_booster") {
-              newItem.luckboost = item.luckboost;
-            } else if (item.type === "no_tax") {
-              newItem.notaxAmt = item.notaxAmt;
-            }
-
-            user.items.push(newItem);
-            await user.save();
-
-            if (expirationDate) {
-              setTimeout(async () => {
-                try {
-                  const updatedUser = await User.findOne({
-                    userId: interaction.user.id,
-                  });
-
-                  if (updatedUser) {
-                    updatedUser.items = updatedUser.items.filter((userItem) =>
-                      userItem.expirationDate
-                        ? userItem.expirationDate > Date.now()
-                        : true
-                    );
-
-                    // Remove the item from the database if expired
-                    await User.updateOne(
-                      { userId: interaction.user.id },
-                      {
-                        $pull: {
-                          items: { expirationDate: { $lt: Date.now() } },
-                        },
-                      }
-                    );
-
-                    await updatedUser.save();
-                  }
-                } catch (error) {
-                  consola.error(c.red('Error removing expired item:' + error));
-                }
-              }, item.expirationDuration);
-            }
+            await addItemToUser(interaction.user.id, item);
+            await handleExpiration(interaction.user.id, item);
 
             const confirmationEmbed = new EmbedBuilder()
               .setColor(existingGuild.config.embedColor)
@@ -263,8 +186,8 @@ module.exports = {
                   value: item.description || "No effect",
                 },
                 {
-                  name: "Unique Item",
-                  value: embedUnique,
+                  name: "Item Limit",
+                  value: itemLimitPrompt,
                 },
                 {
                   name: "Expiration",
@@ -285,7 +208,7 @@ module.exports = {
             components: generateComponents(page),
           });
         } catch (error) {
-          consola.error(c.red('Error handling interaction:' + error));
+          consola.error(c.red("Error handling interaction:" + error));
           if (error.code === 10008) {
             await i.reply({
               content:
@@ -307,7 +230,7 @@ module.exports = {
         });
       });
     } catch (error) {
-      consola.error(c.red('Error executing shop command:' + error));
+      consola.error(c.red("Error executing shop command:" + error));
       await interaction.reply({
         content: "An error occurred while processing the shop command.",
         ephemeral: true,

@@ -38,17 +38,19 @@ module.exports = {
       return interaction.reply("You do not have any items.");
     }
 
-    // Combine duplicate items
-    const itemCounts = user.items.reduce((acc, item) => {
-      const key = `${item.name}-${item.description}-${item.type}`;
-      if (!acc[key]) {
-        acc[key] = { ...item._doc, count: 0 }; // _doc to access the original document
-      }
-      acc[key].count += 1;
-      return acc;
-    }, {});
+    // Combine duplicate items and keep the one with the highest expirationDate
+    const itemMap = new Map();
 
-    const combinedItems = Object.values(itemCounts);
+    user.items.forEach((item) => {
+      const key = `${item.name}-${item.description}-${item.type}`;
+      const currentItem = itemMap.get(key);
+
+      if (!currentItem || (item.expirationDate && item.expirationDate > currentItem.expirationDate)) {
+        itemMap.set(key, { ...item._doc, count: (currentItem ? currentItem.count + 1 : 1) });
+      }
+    });
+
+    const combinedItems = Array.from(itemMap.values());
 
     // Pagination setup
     let page = 0;
@@ -76,7 +78,6 @@ module.exports = {
           inline: false,
         });
       });
-
 
       return embed;
     };

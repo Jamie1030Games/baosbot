@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ComponentType, AttachmentBuilder } = require('discord.js');
 const path = require('path');

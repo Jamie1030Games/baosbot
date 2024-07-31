@@ -54,6 +54,14 @@ module.exports = {
         .setName("unique")
         .setDescription("If the item is unique (1 per member)")
         .setRequired(true)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("limit")
+        .setDescription(
+          "Limit of the items held. 1 is the same as being unique. 0 means no limit."
+        )
+        .setRequired(true)
     ),
 
   async execute(interaction) {
@@ -77,7 +85,7 @@ module.exports = {
     const expirationDuration = interaction.options.getInteger("expiration");
     const price = interaction.options.getInteger("price");
     const type = interaction.options.getString("type");
-    const isUnique = interaction.options.getBoolean("unique");
+    const limit = interaction.options.getInteger('limit');
 
     const embed = new EmbedBuilder()
       .setColor(existingGuild.config.embedColor)
@@ -87,8 +95,8 @@ module.exports = {
         { name: "Description", value: description },
         { name: "Expiration Duration", value: `${expirationDuration} ms` },
         { name: "Price", value: `${price} coins` },
-        { name: "Is Unique", value: `${isUnique}` },
-        { name: "Type", value: type }
+        { name: "Type", value: type },
+        { name: '# Limit', value: limit }
       )
       .setFooter({ text: "Please provide additional details." });
 
@@ -161,7 +169,7 @@ module.exports = {
           multiplier,
           notaxAmt,
           luckBoost,
-          isUnique,
+          limit,
         });
 
         await newItem.save();
