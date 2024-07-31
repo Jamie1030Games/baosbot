@@ -75,7 +75,7 @@ module.exports = {
         name: item.name,
         description: item.description,
         multiplier: item.multiplier,
-        luckboost: item.luckBoost,
+        luckBoost: item.luckBoost,
         type: item.type,
         expirationDate,
       };
@@ -83,7 +83,7 @@ module.exports = {
       if (item.type === 'coin_multiplier') {
         newItem.multiplier = item.multiplier;
       } else if (item.type === 'luck_booster') {
-        newItem.luckboost = item.luckboost;
+        newItem.luckBoost = item.luckBoost;
       }
 
       user.items.push(newItem);

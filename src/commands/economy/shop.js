@@ -13,9 +13,29 @@ const User = require("../../schemas/user");
 const convertMilliseconds = require("../../functions/converters/convertMilliseconds.js");
 const Guild = require("../../schemas/guild.js");
 const checkItemLimit = require("../../middleware/checkItemLimit");
-const addItemToUser = require('../../middleware/addItem.js');
+const addItemToUser = require("../../middleware/addItem.js");
 const handleExpiration = require("../../middleware/handleExpiration");
 let itemLimitPrompt;
+
+const formatItemProperties = (item) => {
+  let properties = "";
+
+  switch (item.type) {
+    case "coin_multiplier":
+      properties = `Coin Multiplier (${item.multiplier}x)`;
+      break;
+    case "luck_booster":
+      properties = `Luck Boost (${item.luckBoost}%)`;
+      break;
+    case "no_tax":
+      properties = `No Tax Amount (${item.notaxAmt})`;
+      break;
+    default:
+      properties = `Other`;
+  }
+
+  return properties;
+};
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -37,6 +57,7 @@ module.exports = {
     } catch (error) {
       consola.error(c.red(`Error adding guild to the database:`, error));
     }
+
     let itemExp;
     try {
       // Fetch items and filter out items that are off sale
@@ -61,7 +82,7 @@ module.exports = {
         if (item.limit >= 1) {
           itemLimitPrompt = `Up to ${item.limit}.`;
         } else if (item.limit <= 0) {
-          itemLimitPrompt = 'No limit.';
+          itemLimitPrompt = "No limit.";
         }
 
         const embed = new EmbedBuilder()
@@ -71,7 +92,7 @@ module.exports = {
           .addFields(
             {
               name: "Effect",
-              value: item.type || "No effect",
+              value: formatItemProperties(item) || "No effect",
             },
             {
               name: "Price",
@@ -183,7 +204,7 @@ module.exports = {
               .addFields(
                 {
                   name: "Effect",
-                  value: item.description || "No effect",
+                  value: formatItemProperties(item) || "No effect",
                 },
                 {
                   name: "Item Limit",

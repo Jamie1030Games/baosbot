@@ -75,8 +75,8 @@ module.exports = {
     if (!isLuckItem || isLuckItem == "undefined" || isLuckItem == null) {
       hasWon = Math.random() > LOSS_CHANCE; // 25% chance to win
     } else {
-      luckBoosterInfo = ` (${isLuckItem.luckboost}% greater chance to win with your luck boost)`;
-      hasWon = Math.random() > LOSS_CHANCE - isLuckItem.luckboost; // 25% chance to win
+      luckBoosterInfo = ` (${isLuckItem.luckBoost}% greater chance to win with your luck boost)`;
+      hasWon = Math.random() > LOSS_CHANCE - isLuckItem.luckBoost; // 25% chance to win
     }
 
     let rewardAmount = 0;

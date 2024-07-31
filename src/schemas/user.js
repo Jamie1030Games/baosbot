@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
       notaxAmt: { type: Number, default: '0' },
-      luckboost: String,
+      luckBoost: String,
       expirationDate: Date,
       isUnique: { type: String, default: 'false' },
     },

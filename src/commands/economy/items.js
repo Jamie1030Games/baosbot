@@ -54,8 +54,28 @@ module.exports = {
 
     // Pagination setup
     let page = 0;
-    const itemsPerPage = 10;
+    const itemsPerPage = 4;
     const totalPages = Math.ceil(combinedItems.length / itemsPerPage);
+
+    const formatItemProperties = (item) => {
+      let properties = "";
+
+      switch (item.type) {
+        case "coin_multiplier":
+          properties = `Multiplier: x${item.multiplier}`;
+          break;
+        case "luck_booster":
+          properties = `Luck Boost: ${item.luckBoost}%`;
+          break;
+        case "no_tax":
+          properties = `No Tax Amount: ${item.notaxAmt}`;
+          break;
+        default:
+          properties = `Other`;
+      }
+
+      return properties;
+    };
 
     const generateEmbed = (page) => {
       const start = page * itemsPerPage;
@@ -69,12 +89,13 @@ module.exports = {
         .setFooter({ text: `Page ${page + 1} of ${totalPages}` });
 
       currentItems.forEach((item) => {
-        const expirationDate = item.expirationDate
-          ? timeUntil(item.expirationDate)
-          : "Never";
+        const expirationDate = item.expirationDate;
+        const formattedExpiration = expirationDate ? timeUntil(expirationDate) : "Never";
+        const itemProperties = formatItemProperties(item);
+
         embed.addFields({
           name: `Item: ${item.name} (x${item.count})`,
-          value: `Effect: ${item.description}\nExpires: ${expirationDate}`,
+          value: `Effect: ${item.description}\n${itemProperties}\nExpires: ${formattedExpiration}`,
           inline: false,
         });
       });

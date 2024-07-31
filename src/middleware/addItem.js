@@ -20,7 +20,7 @@ const addItemToUser = async (userId, item) => {
   };
 
   // Add dynamic properties based on item type
-  const dynamicProperties = ["multiplier", "luckboost", "notaxAmt", "other"];
+  const dynamicProperties = ["multiplier", "luckBoost", "notaxAmt", "other"];
   dynamicProperties.forEach((prop) => {
     if (item[prop] !== undefined) {
       newItem[prop] = item[prop];
